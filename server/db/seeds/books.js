@@ -1,7 +1,7 @@
 exports.seed = (knex) => {
   // return knex('ingredients').del()
   //   .then(() => {
-  return knex('ingredients').insert([
+  return knex('books').insert([
     {
       b_id: 1,
       b_title: 'Salpicon de Espaldilla',
