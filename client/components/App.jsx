@@ -1,15 +1,19 @@
 import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+
+// Import Components
+import Header from './Header'
+import Footer from './Footer'
 
 function App () {
   return (
-    <>
-      <header className="header">
-        <h1>My Collection</h1>
-      </header>
-      <section className="main">
-        {/* add your code here */}
-      </section>
-    </>
+    <Router>
+      <Header />
+        <Routes>
+          <Route />
+        </Routes>
+      <Footer />
+    </Router>
   )
 }
 
