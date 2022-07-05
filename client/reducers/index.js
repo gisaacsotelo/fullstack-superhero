@@ -2,8 +2,9 @@
 
 import { combineReducers } from 'redux'
 
-// import stuff from './stuff'
+// Import reducers
+import booksReducer from './booksReducer'
 
 export default combineReducers({
-  // stuff
+  books: booksReducer,
 })
