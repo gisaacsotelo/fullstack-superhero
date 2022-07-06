@@ -17,13 +17,18 @@ function Home() {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    // & LOGHERE----------------------------
+    console.log(`useEffect running on mount only`)
     // get data from API
     getTheBooksAPI()
     // we recieve an array of all the books
       .then(booksArray => {
+        // & LOGHERE----------------------------
+        console.log(`Inside useEffect we got the books from our seeds:\n`,booksArray)
         // now we create an action to set those books on the store
         const setAllBooksAction = setAllBooksAC(booksArray)
-        // now we dispatch the action
+        console.log(`Action recieved: `,setAllBooksAction)
+        // now we dispatch the action so it gets stored on the store
         dispatch(setAllBooksAction)
       })
       .catch(err => {
@@ -35,9 +40,11 @@ function Home() {
     <>
       <h2>Welcome to the library</h2>
       <p>Check the books we currently have</p>
-      {state.map((book, index) => (
-        <Book key={index} bookInfo={book} />
-      ))}
+      <div className="shelf">
+        {state.map((book, index) => (
+          <Book key={index} bookInfo={book} />
+        ))}
+      </div>
     </>
   )
 }

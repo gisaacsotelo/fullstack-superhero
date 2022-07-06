@@ -3,7 +3,7 @@ import React from 'react'
 function Header() {
   return (
     <header>
-      <h1>Welcome to MBC Library</h1>
+      <h1>MBC Library</h1>
     </header>
   )
 }

@@ -1,12 +1,17 @@
 import React from 'react'
 
-function Book(props) {
-  // destructuring 
+// destructured bookInfo from props
+function Book({ bookInfo }) {
+  // destructuring bookinfo
+  const { b_title, b_author, b_cathegory, is_out } = bookInfo
 
-  console.log(`These are the proprs inside book: `, props)
   return (
     <div className="book">
-      <h3>{props.bookInfo.b_title}</h3>
+      <h3>{b_title}</h3>
+      <p><span className='bold'>Author:</span> {b_author}</p>
+      <p><span className='bold'>Cathegory:</span> {b_cathegory}</p>
+      <p><span className='bold'>Available:</span> {is_out ? 'No' : 'Yes'}</p>
+
     </div>
   )
 }

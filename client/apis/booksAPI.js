@@ -6,7 +6,7 @@ import request from 'superagent'
 export function getTheBooksAPI() {
   // making data request to our db
   return request.get('/bookAPI/v1/books').then((response) => {
-    console.log(`Response from API request to db: `, response)
+    console.log(`Response from API request to db: `, response.body)
     return response.body
   })
 }
