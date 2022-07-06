@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 // import components
 import Book from './Book'
 
 // import functions
-import { getTheBooks } from '../apis/booksAPI'
+import { getTheBooksAPI } from '../apis/booksAPI'
+import { setAllBooksAC } from '../actions' // gets it from index.js
 
 
 function Home() {
@@ -13,15 +14,18 @@ function Home() {
   const state = useSelector(globalState => {
     return globalState.books
   })
+  const dispatch = useDispatch()
 
   useEffect(() => {
     // get data from API
-    getTheBooks()
-      .then(
-        // we recieved all the books from database
-        // create an action?
-        // dispatch it?
-      )
+    getTheBooksAPI()
+    // we recieve an array of all the books
+      .then(booksArray => {
+        // now we create an action to set those books on the store
+        const setAllBooksAction = setAllBooksAC(booksArray)
+        // now we dispatch the action
+        dispatch(setAllBooksAction)
+      })
       .catch(err => {
         console.log(`Mounting Error: `,err)
       })

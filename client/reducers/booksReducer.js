@@ -1,4 +1,5 @@
 // ^ BOOKS REDUCER
+import { GIMMA_ALL_FRUITS } from '../actions'
 
 const initialState = [
   // {
@@ -22,6 +23,9 @@ function booksReducer(state = initialState, action) {
   const { type, payload } = action
 
   switch (type) {
+    case GIMMA_ALL_FRUITS: {
+      return payload
+    }
     default: {
       // we do nothing return state unchanged
       return state
