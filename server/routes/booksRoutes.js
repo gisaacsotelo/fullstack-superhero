@@ -14,3 +14,6 @@ router.get('/', (request, response) => {
     })
     .catch((err) => response.status(500).json({ err: err.message }))
 })
+
+// export router
+module.exports = router
