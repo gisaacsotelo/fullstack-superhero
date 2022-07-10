@@ -11,9 +11,7 @@ import { setAllBooksAC } from '../actions' // gets it from index.js
 
 function Home() {
   // Accessing the books state from store
-  const state = useSelector(globalState => {
-    return globalState.books
-  })
+  const booksArr = useSelector(globalState => globalState.books)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -35,7 +33,7 @@ function Home() {
     <>
       <h2>Welcome to the library</h2>
       <p>Check the books we currently have</p>
-      {state.map((book, index) => (
+      {booksArr.map((book, index) => (
         <Book key={index} bookInfo={book} />
       ))}
     </>
