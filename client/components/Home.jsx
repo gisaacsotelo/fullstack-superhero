@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 // import components
 import Book from './Book'
+import AddBookForm from './AddBookForm'
 
 // import functions
 import { getTheBooksAPI } from '../apis/booksAPI'
@@ -32,6 +33,7 @@ function Home() {
   return (
     <>
       <h2>Library</h2>
+      <AddBookForm />
       <p>Check the books we currently have</p>
       {booksArr.map((book, index) => (
         <Book key={index} bookInfo={book} />

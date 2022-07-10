@@ -9,3 +9,11 @@ export function getTheBooksAPI() {
     return response.body
   })
 }
+
+// ~addBookAPI
+export function addBookAPI(newBook) {
+  return request
+    .post('/bookAPI/v1/books')
+    .send(newBook)
+    .then((response) => response.body)
+}
