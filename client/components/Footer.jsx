@@ -4,6 +4,8 @@ function Footer() {
   return (
     <footer>
       <p>Amazing footer</p>
+      Thanks to:
+      <p>https://openlibrary.org/dev/docs/api/covers</p>
     </footer>
   )
 }

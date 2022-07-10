@@ -3,7 +3,7 @@ import React from 'react'
 function Header() {
   return (
     <header>
-      <h1>Library Internal Database</h1>
+      <h1>MBC Library</h1>
     </header>
   )
 }

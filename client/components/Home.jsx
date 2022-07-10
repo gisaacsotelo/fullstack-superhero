@@ -15,7 +15,7 @@ function Home() {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    // get data from API
+    // get data from API (asking to database)
     getTheBooksAPI()
     // we recieve an array of all the books
       .then(booksArray => {
@@ -31,7 +31,7 @@ function Home() {
 
   return (
     <>
-      <h2>Welcome to the library</h2>
+      <h2>Library</h2>
       <p>Check the books we currently have</p>
       {booksArr.map((book, index) => (
         <Book key={index} bookInfo={book} />
