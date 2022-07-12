@@ -10,7 +10,11 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DONATE_BOOK": () => (/* binding */ DONATE_BOOK),
+/* harmony export */   "GET_ALL_HEROES": () => (/* binding */ GET_ALL_HEROES),
 /* harmony export */   "GIMMA_ALL_FRUITS": () => (/* binding */ GIMMA_ALL_FRUITS),
+/* harmony export */   "donateBookAC": () => (/* binding */ donateBookAC),
+/* harmony export */   "getHeroesFromDbAC": () => (/* binding */ getHeroesFromDbAC),
 /* harmony export */   "setAllBooksAC": () => (/* binding */ setAllBooksAC)
 /* harmony export */ });
 // ^  MAIN ACTION CREATOR
@@ -19,12 +23,30 @@ __webpack_require__.r(__webpack_exports__);
 // VARIABLES
 // (types from actions) used to trigger errors when
 // mispelled on the switch statements
-const GIMMA_ALL_FRUITS = 'GIMMA_ALL_FRUITS'; // ACTION CREATOR FUNCTIONS
+const GIMMA_ALL_FRUITS = 'GIMMA_ALL_FRUITS';
+const DONATE_BOOK = 'DONATE_BOOK';
+const GET_ALL_HEROES = 'GET_ALL_HEROES'; // ACTION CREATOR FUNCTIONS
 
 function setAllBooksAC(allBooks) {
   return {
     type: GIMMA_ALL_FRUITS,
     payload: allBooks
+  };
+}
+function donateBookAC(newBook) {
+  return {
+    type: DONATE_BOOK,
+    payload: newBook
+  };
+} //  & --------------------
+//  & HEROES ACTIONS
+//  & --------------------
+// ~getHeroesFromDbAC
+
+function getHeroesFromDbAC(allHeroes) {
+  return {
+    type: GET_ALL_HEROES,
+    payload: allHeroes
   };
 }
 
@@ -39,6 +61,7 @@ function setAllBooksAC(allBooks) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "addBookAPI": () => (/* binding */ addBookAPI),
 /* harmony export */   "getTheBooksAPI": () => (/* binding */ getTheBooksAPI)
 /* harmony export */ });
 /* harmony import */ var superagent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! superagent */ "./node_modules/superagent/lib/client.js");
@@ -53,7 +76,115 @@ function getTheBooksAPI() {
     console.log(`Response from API request to db: `, response.body);
     return response.body;
   });
+} // ~addBookAPI
+
+function addBookAPI(newBook) {
+  return superagent__WEBPACK_IMPORTED_MODULE_0___default().post('/bookAPI/v1/books').send(newBook).then(response => response.body);
 }
+
+/***/ }),
+
+/***/ "./client/apis/heroesAPI.js":
+/*!**********************************!*\
+  !*** ./client/apis/heroesAPI.js ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getAllHeroesDBAPI": () => (/* binding */ getAllHeroesDBAPI)
+/* harmony export */ });
+/* harmony import */ var superagent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! superagent */ "./node_modules/superagent/lib/client.js");
+/* harmony import */ var superagent__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(superagent__WEBPACK_IMPORTED_MODULE_0__);
+//  ^ HEROES API (DATA ROUTES)
+// Import superagent: used to make requests for data
+ //~getAllHeroesDBAPI
+
+function getAllHeroesDBAPI() {
+  // requestion through our route
+  return superagent__WEBPACK_IMPORTED_MODULE_0___default().get('/heroesAPI/v1/heroes').then(response => {
+    return response.body;
+  });
+}
+
+/***/ }),
+
+/***/ "./client/components/AddBookForm.jsx":
+/*!*******************************************!*\
+  !*** ./client/components/AddBookForm.jsx ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../actions */ "./client/actions/index.js");
+/* harmony import */ var _apis_booksAPI__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../apis/booksAPI */ "./client/apis/booksAPI.js");
+
+ // import functions 
+// (action creators)
+
+ // API functions
+
+
+
+function AddBookForm() {
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)(); // ~handleSubmit
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    const newBookTitle = e.target.bookTitle.value;
+    const newBookAuthor = e.target.bookAuthor.value;
+    const newBookCathegory = e.target.bookCathegory.value; // create the object (newBook) I want to add
+
+    const newBook = {
+      title: newBookTitle,
+      author: newBookAuthor,
+      cathegory: newBookCathegory
+    }; // Create action to donate the new book (add a book to the database)
+
+    const action = (0,_actions__WEBPACK_IMPORTED_MODULE_2__.donateBookAC)(newBook); // dispatch action to the store
+
+    dispatch(action); // send the new book to the database - dataroute API
+    // todo: 
+
+    /* 
+    define data structure to send to the db
+    check thunks and when to use it
+     */
+  };
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", {
+    onSubmit: handleSubmit
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h4", null, "Donate a Book!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", {
+    htmlFor: "bookTitle"
+  }, "Book Title:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
+    type: "text",
+    id: "bookTitle",
+    placeholder: "Book Title"
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", {
+    htmlFor: "bookAuthor"
+  }, "Book Author:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
+    type: "text",
+    id: "bookAuthor",
+    placeholder: "Book Author"
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", {
+    htmlFor: "bookCathegory"
+  }, "Book Cathegory:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
+    type: "text",
+    id: "bookCathegory",
+    placeholder: "Book Cathegory"
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", {
+    type: "submit"
+  }, "Donate!"));
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AddBookForm);
 
 /***/ }),
 
@@ -69,13 +200,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/index.js");
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/index.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/index.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/index.js");
 /* harmony import */ var _Home__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Home */ "./client/components/Home.jsx");
-/* harmony import */ var _Header__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Header */ "./client/components/Header.jsx");
-/* harmony import */ var _Footer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Footer */ "./client/components/Footer.jsx");
+/* harmony import */ var _Heroes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Heroes */ "./client/components/Heroes.jsx");
+/* harmony import */ var _HeroProfile__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./HeroProfile */ "./client/components/HeroProfile.jsx");
+/* harmony import */ var _HeroesCollection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./HeroesCollection */ "./client/components/HeroesCollection.jsx");
+/* harmony import */ var _Header__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Header */ "./client/components/Header.jsx");
+/* harmony import */ var _Footer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Footer */ "./client/components/Footer.jsx");
 
  // Import view Components
+
+
+
 
  // Import Components
 
@@ -83,12 +220,21 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function App() {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.BrowserRouter, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Header__WEBPACK_IMPORTED_MODULE_2__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_7__.BrowserRouter, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Header__WEBPACK_IMPORTED_MODULE_5__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "main"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Routes, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Route, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_8__.Routes, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_8__.Route, {
     path: "/",
     element: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Home__WEBPACK_IMPORTED_MODULE_1__["default"], null)
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Footer__WEBPACK_IMPORTED_MODULE_3__["default"], null));
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_8__.Route, {
+    path: "/heroes",
+    element: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Heroes__WEBPACK_IMPORTED_MODULE_2__["default"], null)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_8__.Route, {
+    path: "/heroes/collection",
+    element: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_HeroesCollection__WEBPACK_IMPORTED_MODULE_4__["default"], null)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_8__.Route, {
+    path: "/heroes/:profile",
+    element: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_HeroProfile__WEBPACK_IMPORTED_MODULE_3__["default"], null)
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Footer__WEBPACK_IMPORTED_MODULE_6__["default"], null));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);
@@ -150,7 +296,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function Footer() {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("footer", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Amazing footer"));
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("footer", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Amazing footer"), "Thanks to:", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "https://openlibrary.org/dev/docs/api/covers"));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Footer);
@@ -179,6 +325,117 @@ function Header() {
 
 /***/ }),
 
+/***/ "./client/components/HeroProfile.jsx":
+/*!*******************************************!*\
+  !*** ./client/components/HeroProfile.jsx ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+
+function HeroProfile() {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "HeroProfile");
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (HeroProfile);
+
+/***/ }),
+
+/***/ "./client/components/Heroes.jsx":
+/*!**************************************!*\
+  !*** ./client/components/Heroes.jsx ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _apis_heroesAPI__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../apis/heroesAPI */ "./client/apis/heroesAPI.js");
+
+ // import functions
+
+
+
+function Heroes() {
+  // Access store state
+  // const heroesArr = useSelector(state => state.heroes)
+  // Using this effect only on mounting
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    /* pseudo:
+    call API to get list of all the heroes
+     */
+  }, []);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "Heroes");
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Heroes);
+
+/***/ }),
+
+/***/ "./client/components/HeroesCollection.jsx":
+/*!************************************************!*\
+  !*** ./client/components/HeroesCollection.jsx ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _apis_heroesAPI__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../apis/heroesAPI */ "./client/apis/heroesAPI.js");
+/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../actions */ "./client/actions/index.js");
+/* harmony import */ var _SingleHero__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SingleHero */ "./client/components/SingleHero.jsx");
+
+ // import functions
+
+
+ // Import Components
+
+
+
+function HeroesCollection() {
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)(); // const heroesArr = useSelector(state => state.heroes)
+
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    // 1 Request API to get heroes from DB
+    // 2 recieve heroes
+    (0,_apis_heroesAPI__WEBPACK_IMPORTED_MODULE_2__.getAllHeroesDBAPI)().then(resHeroesArray => {
+      const action = (0,_actions__WEBPACK_IMPORTED_MODULE_3__.getHeroesFromDbAC)(resHeroesArray);
+      dispatch(action);
+    }).catch(err => console.log(err)); // 3 get them into an action to dispatch them to the store
+    // 4 use store array to map through the data
+    // console.log(`Inside the effect heroes`)
+    // // get data from API (asking to database)
+    // getAllHeroesDBAPI()
+    // // we will recieve an array with the current heroes in the database
+    //   .then(heroesArray => {
+    //     //todo:  try using thunk here
+    //     console.log(`response form API call in Heroes component:\n`,heroesArray)
+    //   })
+    //   .catch(err => console.log(err))
+  }, []);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "heroes-collection"
+  });
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (HeroesCollection);
+
+/***/ }),
+
 /***/ "./client/components/Home.jsx":
 /*!************************************!*\
   !*** ./client/components/Home.jsx ***!
@@ -193,10 +450,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var _Book__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Book */ "./client/components/Book.jsx");
-/* harmony import */ var _apis_booksAPI__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../apis/booksAPI */ "./client/apis/booksAPI.js");
-/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../actions */ "./client/actions/index.js");
+/* harmony import */ var _AddBookForm__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./AddBookForm */ "./client/components/AddBookForm.jsx");
+/* harmony import */ var _apis_booksAPI__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../apis/booksAPI */ "./client/apis/booksAPI.js");
+/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../actions */ "./client/actions/index.js");
 
  // import components
+
 
  // import functions
 
@@ -205,20 +464,18 @@ __webpack_require__.r(__webpack_exports__);
 
 function Home() {
   // Accessing the books state from store
-  const state = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(globalState => {
-    return globalState.books;
-  });
+  const booksArr = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(globalState => globalState.books);
   const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     // & LOGHERE----------------------------
     console.log(`useEffect running on mount only`); // get data from API
 
-    (0,_apis_booksAPI__WEBPACK_IMPORTED_MODULE_3__.getTheBooksAPI)() // we recieve an array of all the books
+    (0,_apis_booksAPI__WEBPACK_IMPORTED_MODULE_4__.getTheBooksAPI)() // we recieve an array of all the books
     .then(booksArray => {
       // & LOGHERE----------------------------
       console.log(`Inside useEffect we got the books from our seeds:\n`, booksArray); // now we create an action to set those books on the store
 
-      const setAllBooksAction = (0,_actions__WEBPACK_IMPORTED_MODULE_4__.setAllBooksAC)(booksArray);
+      const setAllBooksAction = (0,_actions__WEBPACK_IMPORTED_MODULE_5__.setAllBooksAC)(booksArray);
       console.log(`Action recieved: `, setAllBooksAction); // now we dispatch the action so it gets stored on the store
 
       dispatch(setAllBooksAction);
@@ -226,15 +483,41 @@ function Home() {
       console.log(`Mounting Error: `, err);
     });
   }, []);
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h2", null, "Welcome to the library"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Check the books we currently have"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h2", null, "Library"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_AddBookForm__WEBPACK_IMPORTED_MODULE_3__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Check the books we currently have"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "shelf"
-  }, state.map((book, index) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Book__WEBPACK_IMPORTED_MODULE_2__["default"], {
+  }, booksArr.map((book, index) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Book__WEBPACK_IMPORTED_MODULE_2__["default"], {
     key: index,
     bookInfo: book
   }))));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Home);
+
+/***/ }),
+
+/***/ "./client/components/SingleHero.jsx":
+/*!******************************************!*\
+  !*** ./client/components/SingleHero.jsx ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+
+function SingleHero(_ref) {
+  let {
+    hero
+  } = _ref;
+  console.log(`I need a :`, hero);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "SingleHero");
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SingleHero);
 
 /***/ }),
 
@@ -41504,7 +41787,6 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
-var __webpack_exports__ = {};
 /*!*************************!*\
   !*** ./client/index.js ***!
   \*************************/
@@ -41530,17 +41812,6 @@ document.addEventListener('DOMContentLoaded', () => {
     store: store
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_components_App__WEBPACK_IMPORTED_MODULE_4__["default"], null)), document.getElementById('app'));
 });
-})();
-
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-/*!**********************************!*\
-  !*** ./client/styles/index.scss ***!
-  \**********************************/
-__webpack_require__.r(__webpack_exports__);
-// extracted by mini-css-extract-plugin
-
 })();
 
 /******/ })()
