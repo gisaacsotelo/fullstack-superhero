@@ -9,6 +9,7 @@
 
 export const GIMMA_ALL_FRUITS = 'GIMMA_ALL_FRUITS'
 export const DONATE_BOOK = 'DONATE_BOOK'
+export const GET_ALL_HEROES = 'GET_ALL_HEROES'
 
 // ACTION CREATOR FUNCTIONS
 
@@ -23,5 +24,17 @@ export function donateBookAC(newBook) {
   return {
     type: DONATE_BOOK,
     payload: newBook,
+  }
+}
+
+//  & --------------------
+//  & HEROES ACTIONS
+//  & --------------------
+
+// ~getHeroesFromDbAC
+export function getHeroesFromDbAC(allHeroes) {
+  return {
+    type: GET_ALL_HEROES,
+    payload: allHeroes,
   }
 }
