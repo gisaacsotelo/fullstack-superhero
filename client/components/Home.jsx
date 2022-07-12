@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 // import components
 import Book from './Book'
+import AddBookForm from './AddBookForm'
 
 // import functions
 import { getTheBooksAPI } from '../apis/booksAPI'
@@ -11,9 +12,7 @@ import { setAllBooksAC } from '../actions' // gets it from index.js
 
 function Home() {
   // Accessing the books state from store
-  const state = useSelector(globalState => {
-    return globalState.books
-  })
+  const booksArr = useSelector(globalState => globalState.books)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -38,10 +37,11 @@ function Home() {
 
   return (
     <>
-      <h2>Welcome to the library</h2>
+      <h2>Library</h2>
+      <AddBookForm />
       <p>Check the books we currently have</p>
       <div className="shelf">
-        {state.map((book, index) => (
+        {booksArr.map((book, index) => (
           <Book key={index} bookInfo={book} />
         ))}
       </div>
