@@ -17,7 +17,7 @@ function getAllBooks(db = connection) {
 // ~getAllHeroesDB
 function getAllHeroesDB(db = connection) {
   // selects table heroes all data
-  return db('heroes')
+  return db('heroes') 
 }
 
 module.exports = {

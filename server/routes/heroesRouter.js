@@ -11,8 +11,6 @@ const { getAllHeroesDB } = require('../db/database')
 router.get('/', (req, res) => {
   getAllHeroesDB()
     .then((heroesArr) => {
-      console.log(`Router getAllHeroesDB array: `, heroesArr)
-      // console.log(`Router getAllHeroesDB res.json: `, res.json(heroesArr))
       return res.json(heroesArr)
     })
     .catch((err) => res.status(500).json({ err: err.message }))

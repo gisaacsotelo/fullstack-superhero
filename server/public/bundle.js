@@ -10,22 +10,37 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ADD_HEROES": () => (/* binding */ ADD_HEROES),
 /* harmony export */   "DONATE_BOOK": () => (/* binding */ DONATE_BOOK),
 /* harmony export */   "GET_ALL_HEROES": () => (/* binding */ GET_ALL_HEROES),
 /* harmony export */   "GIMMA_ALL_FRUITS": () => (/* binding */ GIMMA_ALL_FRUITS),
+/* harmony export */   "HERO_LOAD_COMPLETED": () => (/* binding */ HERO_LOAD_COMPLETED),
+/* harmony export */   "HERO_LOAD_FAILED": () => (/* binding */ HERO_LOAD_FAILED),
+/* harmony export */   "HERO_LOAD_STARTED": () => (/* binding */ HERO_LOAD_STARTED),
+/* harmony export */   "addHeroesAC": () => (/* binding */ addHeroesAC),
 /* harmony export */   "donateBookAC": () => (/* binding */ donateBookAC),
 /* harmony export */   "getHeroesFromDbAC": () => (/* binding */ getHeroesFromDbAC),
-/* harmony export */   "setAllBooksAC": () => (/* binding */ setAllBooksAC)
+/* harmony export */   "heroLoadingCompleteAC": () => (/* binding */ heroLoadingCompleteAC),
+/* harmony export */   "heroLoadingFailedAC": () => (/* binding */ heroLoadingFailedAC),
+/* harmony export */   "heroLoadingStartedAC": () => (/* binding */ heroLoadingStartedAC),
+/* harmony export */   "setAllBooksAC": () => (/* binding */ setAllBooksAC),
+/* harmony export */   "setAllHeroesThunk": () => (/* binding */ setAllHeroesThunk)
 /* harmony export */ });
+/* harmony import */ var _apis_heroesAPI__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../apis/heroesAPI */ "./client/apis/heroesAPI.js");
 // ^  MAIN ACTION CREATOR
 // import functions from API
-// import { getAllBooksAPI } from '../apis/booksAPI'
-// VARIABLES
+ // VARIABLES
 // (types from actions) used to trigger errors when
 // mispelled on the switch statements
+
 const GIMMA_ALL_FRUITS = 'GIMMA_ALL_FRUITS';
-const DONATE_BOOK = 'DONATE_BOOK';
-const GET_ALL_HEROES = 'GET_ALL_HEROES'; // ACTION CREATOR FUNCTIONS
+const DONATE_BOOK = 'DONATE_BOOK'; // heroes
+
+const GET_ALL_HEROES = 'GET_ALL_HEROES';
+const HERO_LOAD_STARTED = 'HERO_LOAD_STARTED';
+const HERO_LOAD_FAILED = 'HERO_LOAD_FAILED';
+const HERO_LOAD_COMPLETED = 'HERO_LOAD_COMPLETED';
+const ADD_HEROES = 'ADD_HEROES'; // ACTION CREATOR FUNCTIONS
 
 function setAllBooksAC(allBooks) {
   return {
@@ -47,6 +62,56 @@ function getHeroesFromDbAC(allHeroes) {
   return {
     type: GET_ALL_HEROES,
     payload: allHeroes
+  };
+} //* loading actions ---------
+// ~ heroLoadingStarted
+
+function heroLoadingStartedAC() {
+  return {
+    type: HERO_LOAD_STARTED
+  };
+} // ~ heroLoadingCompleteAC
+
+function heroLoadingCompleteAC(heroes) {
+  return {
+    type: HERO_LOAD_COMPLETED,
+    payload: heroes
+  };
+} // ~ heroLoadingFailedAC
+
+function heroLoadingFailedAC() {
+  return {
+    type: HERO_LOAD_FAILED
+  };
+} // ~ addHeroesAC
+
+function addHeroesAC(heroes) {
+  return {
+    loading: true,
+    failed: false,
+    type: ADD_HEROES,
+    payload: heroes
+  };
+} //*  THUNKS
+// ~setAllHeroesThunk
+
+function setAllHeroesThunk() {
+  // start loading
+  // request heroes
+  // when recieved: 
+  return dispatch => {
+    // tell we are loading
+    dispatch(heroLoadingStartedAC()); // get the heroes
+
+    (0,_apis_heroesAPI__WEBPACK_IMPORTED_MODULE_0__.getAllHeroesExtAPI)().then(heroes => {
+      // fetching succeded
+      const action = heroLoadingCompleteAC(heroes);
+      dispatch(action);
+    }).catch(() => {
+      // fetching failed
+      const action = heroLoadingFailedAC();
+      dispatch(action);
+    });
   };
 }
 
@@ -93,20 +158,27 @@ function addBookAPI(newBook) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "getAllHeroesDBAPI": () => (/* binding */ getAllHeroesDBAPI)
+/* harmony export */   "getAllHeroesExtAPI": () => (/* binding */ getAllHeroesExtAPI)
 /* harmony export */ });
 /* harmony import */ var superagent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! superagent */ "./node_modules/superagent/lib/client.js");
 /* harmony import */ var superagent__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(superagent__WEBPACK_IMPORTED_MODULE_0__);
 //  ^ HEROES API (DATA ROUTES)
 // Import superagent: used to make requests for data
- //~getAllHeroesDBAPI
 
-function getAllHeroesDBAPI() {
-  // requestion through our route
-  return superagent__WEBPACK_IMPORTED_MODULE_0___default().get('/heroesAPI/v1/heroes').then(response => {
-    return response.body;
-  });
-}
+const baseURLAPI = 'https://akabab.github.io/superhero-api/api'; //~getAllHeroesDBAPI
+
+function getAllHeroesExtAPI() {
+  // requesting ext API
+  return superagent__WEBPACK_IMPORTED_MODULE_0___default().get(`${baseURLAPI}/all.json`).then(responseAllHeroes => {
+    const sups = responseAllHeroes.body.slice(130, 145);
+    return sups;
+  }).catch(err => console.log(err));
+} // // THUNKS
+// export function getAllHeroesThunk(){
+//   return (dispatch) => {
+//     dispatch(getAllHeroesDBAPI())
+//   }
+// }
 
 /***/ }),
 
@@ -361,21 +433,50 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var _apis_heroesAPI__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../apis/heroesAPI */ "./client/apis/heroesAPI.js");
+/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../actions */ "./client/actions/index.js");
+/* harmony import */ var _SingleHero__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SingleHero */ "./client/components/SingleHero.jsx");
 
  // import functions
+
+
+ // import components
 
 
 
 function Heroes() {
   // Access store state
-  // const heroesArr = useSelector(state => state.heroes)
-  // Using this effect only on mounting
+  const heroesState = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.heroes);
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
+  console.log(`heroesState: `, heroesState);
+  const loading = heroesState.loading;
+  const failed = heroesState.failed;
+  const heroArray = heroesState.heroes;
+  console.log(`heroArray: `, heroArray); // Using this effect only on mounting
+
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    /* pseudo:
-    call API to get list of all the heroes
-     */
+    (0,_apis_heroesAPI__WEBPACK_IMPORTED_MODULE_2__.getAllHeroesExtAPI)().then(heroes => {
+      const action = (0,_actions__WEBPACK_IMPORTED_MODULE_3__.addHeroesAC)(heroes);
+      dispatch(action);
+    }).catch(err => console.log(`ERRORSAXO: `, err)); // dispatch
+    // dispatch(setAllHeroesThunk())
   }, []);
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "Heroes");
+
+  if (loading) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+      className: "container"
+    }, "HEROES ARE LOADING....");
+  }
+
+  if (failed) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+      className: "container"
+    }, "uh-oh.... SOMETHING FAILED.");
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "Heroes"), heroArray.map((singleHero, index) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_SingleHero__WEBPACK_IMPORTED_MODULE_4__["default"], {
+    key: index,
+    hero: singleHero
+  })));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Heroes);
@@ -513,8 +614,21 @@ function SingleHero(_ref) {
   let {
     hero
   } = _ref;
-  console.log(`I need a :`, hero);
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "SingleHero");
+  const image = hero.images.sm;
+  console.log(image); // const stats = JSON.parse(hero.powerstats)
+  // console.log(`STATS: `,stats)
+  // const { intelligence, strength, speed, durability, combat, power } = stats
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "hero"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h3", null, hero.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
+    src: image,
+    alt: hero.name
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
+    className: "hero-info"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Race: ", hero.appearance.race), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "power-stats"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "STATS:"))));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SingleHero);
@@ -578,6 +692,87 @@ function booksReducer() {
 
 /***/ }),
 
+/***/ "./client/reducers/heroesReducer.js":
+/*!******************************************!*\
+  !*** ./client/reducers/heroesReducer.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions */ "./client/actions/index.js");
+//  ^ HEROES REDUCER
+
+const initialState = {
+  loading: true,
+  failed: false
+};
+
+function heroesReducer() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+  // destructure action
+  const {
+    type,
+    payload
+  } = action;
+
+  switch (type) {
+    case _actions__WEBPACK_IMPORTED_MODULE_0__.HERO_LOAD_STARTED:
+      {
+        return {
+          loading: true,
+          failed: false
+        };
+      }
+
+    case _actions__WEBPACK_IMPORTED_MODULE_0__.HERO_LOAD_FAILED:
+      {
+        return {
+          loading: false,
+          failed: true
+        };
+      }
+
+    case _actions__WEBPACK_IMPORTED_MODULE_0__.HERO_LOAD_COMPLETED:
+      {
+        return {
+          loading: false,
+          failed: false,
+          heroes: payload
+        };
+      }
+
+    case _actions__WEBPACK_IMPORTED_MODULE_0__.GET_ALL_HEROES:
+      {
+        return state;
+      }
+
+    case _actions__WEBPACK_IMPORTED_MODULE_0__.ADD_HEROES:
+      {
+        console.log(`ADD_HEROES: `, state);
+        const res = { ...state,
+          loading: false,
+          heroes: payload
+        };
+        console.log(`res: `, res);
+        return res;
+      }
+
+    default:
+      {
+        return state;
+      }
+  }
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (heroesReducer);
+
+/***/ }),
+
 /***/ "./client/reducers/index.js":
 /*!**********************************!*\
   !*** ./client/reducers/index.js ***!
@@ -589,14 +784,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
+/* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
 /* harmony import */ var _booksReducer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./booksReducer */ "./client/reducers/booksReducer.js");
+/* harmony import */ var _heroesReducer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./heroesReducer */ "./client/reducers/heroesReducer.js");
 // ^ MAIN REDUCER
  // Import reducers
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,redux__WEBPACK_IMPORTED_MODULE_1__.combineReducers)({
-  books: _booksReducer__WEBPACK_IMPORTED_MODULE_0__["default"]
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,redux__WEBPACK_IMPORTED_MODULE_2__.combineReducers)({
+  books: _booksReducer__WEBPACK_IMPORTED_MODULE_0__["default"],
+  heroes: _heroesReducer__WEBPACK_IMPORTED_MODULE_1__["default"]
 }));
 
 /***/ }),
