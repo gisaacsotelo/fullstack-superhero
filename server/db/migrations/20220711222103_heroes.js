@@ -8,7 +8,8 @@ exports.up = function (knex) {
     table.string('name')
     table.string('powerstats')
     table.string('publisher')
-    table.string('image')
+    table.string('images')
+    table.string('race')
     table.integer('api_id')
   })
 }

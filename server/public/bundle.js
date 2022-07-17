@@ -10,14 +10,15 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ADD_HEROES": () => (/* binding */ ADD_HEROES),
+/* harmony export */   "ADD_HEROE": () => (/* binding */ ADD_HEROE),
 /* harmony export */   "DONATE_BOOK": () => (/* binding */ DONATE_BOOK),
+/* harmony export */   "FETCH_ALL_HEROES": () => (/* binding */ FETCH_ALL_HEROES),
 /* harmony export */   "GET_ALL_HEROES": () => (/* binding */ GET_ALL_HEROES),
 /* harmony export */   "GIMMA_ALL_FRUITS": () => (/* binding */ GIMMA_ALL_FRUITS),
 /* harmony export */   "HERO_LOAD_COMPLETED": () => (/* binding */ HERO_LOAD_COMPLETED),
 /* harmony export */   "HERO_LOAD_FAILED": () => (/* binding */ HERO_LOAD_FAILED),
 /* harmony export */   "HERO_LOAD_STARTED": () => (/* binding */ HERO_LOAD_STARTED),
-/* harmony export */   "addHeroesAC": () => (/* binding */ addHeroesAC),
+/* harmony export */   "addHeroeAC": () => (/* binding */ addHeroeAC),
 /* harmony export */   "donateBookAC": () => (/* binding */ donateBookAC),
 /* harmony export */   "getHeroesFromDbAC": () => (/* binding */ getHeroesFromDbAC),
 /* harmony export */   "heroLoadingCompleteAC": () => (/* binding */ heroLoadingCompleteAC),
@@ -40,7 +41,8 @@ const GET_ALL_HEROES = 'GET_ALL_HEROES';
 const HERO_LOAD_STARTED = 'HERO_LOAD_STARTED';
 const HERO_LOAD_FAILED = 'HERO_LOAD_FAILED';
 const HERO_LOAD_COMPLETED = 'HERO_LOAD_COMPLETED';
-const ADD_HEROES = 'ADD_HEROES'; // ACTION CREATOR FUNCTIONS
+const ADD_HEROE = 'ADD_HEROE';
+const FETCH_ALL_HEROES = 'FETCH_ALL_HEROES'; // ACTION CREATOR FUNCTIONS
 
 function setAllBooksAC(allBooks) {
   return {
@@ -85,35 +87,64 @@ function heroLoadingFailedAC() {
   };
 } // ~ addHeroesAC
 
-function addHeroesAC(heroes) {
+function addHeroeAC(heroe) {
   return {
-    loading: true,
-    failed: false,
-    type: ADD_HEROES,
-    payload: heroes
+    type: ADD_HEROE,
+    payload: heroe
   };
 } //*  THUNKS
 // ~setAllHeroesThunk
 
 function setAllHeroesThunk() {
-  // start loading
-  // request heroes
-  // when recieved: 
   return dispatch => {
     // tell we are loading
-    dispatch(heroLoadingStartedAC()); // get the heroes
+    dispatch(heroLoadingStartedAC()); // get the heroes 2 promises
 
-    (0,_apis_heroesAPI__WEBPACK_IMPORTED_MODULE_0__.getAllHeroesExtAPI)().then(heroes => {
-      // fetching succeded
-      const action = heroLoadingCompleteAC(heroes);
-      dispatch(action);
-    }).catch(() => {
-      // fetching failed
-      const action = heroLoadingFailedAC();
-      dispatch(action);
-    });
+    Promise.all([(0,_apis_heroesAPI__WEBPACK_IMPORTED_MODULE_0__.getAllHeroesExtAPI)(), (0,_apis_heroesAPI__WEBPACK_IMPORTED_MODULE_0__.getHeroCollectionDB)()]).then(values => {
+      const responseExtApi = values[0];
+      const responseDatabase = values[1];
+      console.log(values);
+      let apiHeroesFormatted = responseExtApi.map(hero => {
+        let res = {};
+        res.api_id = hero.id;
+        res.name = hero.name;
+        res.powerstats = hero.powerstats;
+        res.publisher = hero.biography.publisher;
+        res.images = hero.images;
+        res.race = hero.appearance.race;
+        res.collected = false;
+        return res;
+      });
+      let dbHeroesFormatted = responseDatabase.map(hero => {
+        let res = { ...hero
+        };
+        res.collected = true;
+        return res;
+      });
+      const response = {
+        api: apiHeroesFormatted,
+        collection: dbHeroesFormatted
+      }; // completed fetch
+
+      dispatch(heroLoadingCompleteAC(response));
+    }).catch(err => console.log(err));
   };
-}
+} // // ~getHeroCollectionThunk
+// export function getHeroCollectionThunk() {
+//   return (dispatch) => {
+//     dispatch(heroLoadingStartedAC())
+//   }
+// }
+// // ~addHeroThunk
+// export function addHeroThunk(hero) {
+//   return (dispatch) => {
+//     addHeroDB(hero)
+//     .then(res => {
+//       console.log(`response adding hero: `,res)
+//     })
+//     .catch(err => {console.log(err)})
+//   }
+// }
 
 /***/ }),
 
@@ -158,27 +189,42 @@ function addBookAPI(newBook) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "getAllHeroesExtAPI": () => (/* binding */ getAllHeroesExtAPI)
+/* harmony export */   "addHeroDB": () => (/* binding */ addHeroDB),
+/* harmony export */   "getAllHeroesExtAPI": () => (/* binding */ getAllHeroesExtAPI),
+/* harmony export */   "getHeroCollectionDB": () => (/* binding */ getHeroCollectionDB)
 /* harmony export */ });
 /* harmony import */ var superagent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! superagent */ "./node_modules/superagent/lib/client.js");
 /* harmony import */ var superagent__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(superagent__WEBPACK_IMPORTED_MODULE_0__);
 //  ^ HEROES API (DATA ROUTES)
 // Import superagent: used to make requests for data
 
-const baseURLAPI = 'https://akabab.github.io/superhero-api/api'; //~getAllHeroesDBAPI
+const baseURLAPI = 'https://akabab.github.io/superhero-api/api'; //~getAllHeroesExtAPI
 
 function getAllHeroesExtAPI() {
   // requesting ext API
   return superagent__WEBPACK_IMPORTED_MODULE_0___default().get(`${baseURLAPI}/all.json`).then(responseAllHeroes => {
-    const sups = responseAllHeroes.body.slice(130, 145);
-    return sups;
+    // trim response to 15 heroes
+    const reducedArrHeroes = responseAllHeroes.body.slice(130, 145);
+    return reducedArrHeroes;
   }).catch(err => console.log(err));
-} // // THUNKS
-// export function getAllHeroesThunk(){
-//   return (dispatch) => {
-//     dispatch(getAllHeroesDBAPI())
-//   }
-// }
+} // GET heroes
+//  ~getHeroCollectionDB
+
+function getHeroCollectionDB() {
+  return superagent__WEBPACK_IMPORTED_MODULE_0___default().get('/heroesAPI/v1/heroes').then(res => {
+    console.log(`response from db: `, res.body);
+    return res.body;
+  }).catch(err => console.log(err));
+} // POST - add heroe
+// ~addHeroDB
+
+function addHeroDB(hero) {
+  return superagent__WEBPACK_IMPORTED_MODULE_0___default().post('/heroesAPI/v1/heroes').send(hero).then(res => {
+    return res.body;
+  }).catch(err => {
+    err.status(500).send(err.message);
+  });
+}
 
 /***/ }),
 
@@ -387,10 +433,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _Navigation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Navigation */ "./client/components/Navigation.jsx");
+ // import components
+
 
 
 function Header() {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h1", null, "MBC Library"));
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h1", null, "MBC Library")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Navigation__WEBPACK_IMPORTED_MODULE_1__["default"], null));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Header);
@@ -444,22 +493,26 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function Heroes() {
-  // Access store state
   const heroesState = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.heroes);
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
-  console.log(`heroesState: `, heroesState);
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)(); // console.log(`heroesState: `,heroesState)
+
   const loading = heroesState.loading;
   const failed = heroesState.failed;
   const heroArray = heroesState.heroes;
-  console.log(`heroArray: `, heroArray); // Using this effect only on mounting
+  console.log(`heroArray: `, heroArray); // Mounting
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    (0,_apis_heroesAPI__WEBPACK_IMPORTED_MODULE_2__.getAllHeroesExtAPI)().then(heroes => {
-      const action = (0,_actions__WEBPACK_IMPORTED_MODULE_3__.addHeroesAC)(heroes);
-      dispatch(action);
-    }).catch(err => console.log(`ERRORSAXO: `, err)); // dispatch
-    // dispatch(setAllHeroesThunk())
-  }, []);
+    dispatch((0,_actions__WEBPACK_IMPORTED_MODULE_3__.setAllHeroesThunk)());
+  }, []); // functions
+
+  const addHeroClick = hero => {
+    console.log(`click`, hero);
+    hero.collected = true; // addHeroThunk(hero)
+
+    (0,_apis_heroesAPI__WEBPACK_IMPORTED_MODULE_2__.addHeroDB)(hero);
+    dispatch((0,_actions__WEBPACK_IMPORTED_MODULE_3__.addHeroeAC)(hero));
+  }; //  ! RETURNS
+
 
   if (loading) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
@@ -473,10 +526,13 @@ function Heroes() {
     }, "uh-oh.... SOMETHING FAILED.");
   }
 
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "Heroes"), heroArray.map((singleHero, index) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_SingleHero__WEBPACK_IMPORTED_MODULE_4__["default"], {
-    key: index,
-    hero: singleHero
-  })));
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "Heroes"), heroArray.api && heroArray.api.map((singleHero, index) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_SingleHero__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      key: index,
+      hero: singleHero,
+      addHeroClick: addHeroClick
+    });
+  }));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Heroes);
@@ -496,41 +552,50 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
-/* harmony import */ var _apis_heroesAPI__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../apis/heroesAPI */ "./client/apis/heroesAPI.js");
-/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../actions */ "./client/actions/index.js");
-/* harmony import */ var _SingleHero__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SingleHero */ "./client/components/SingleHero.jsx");
+/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../actions */ "./client/actions/index.js");
+/* harmony import */ var _SingleHero__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SingleHero */ "./client/components/SingleHero.jsx");
 
  // import functions
-
+// import { getHeroCollectionThunk } from '../apis/heroesAPI'
 
  // Import Components
 
 
 
 function HeroesCollection() {
-  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)(); // const heroesArr = useSelector(state => state.heroes)
+  const heroesState = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useSelector)(state => state.heroes);
+  const dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.useDispatch)();
+  const loading = heroesState.loading;
+  const failed = heroesState.failed;
+  const heroArray = heroesState.heroes;
+  console.log(`heroArray: `, heroArray); // Mounting
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    // 1 Request API to get heroes from DB
-    // 2 recieve heroes
-    (0,_apis_heroesAPI__WEBPACK_IMPORTED_MODULE_2__.getAllHeroesDBAPI)().then(resHeroesArray => {
-      const action = (0,_actions__WEBPACK_IMPORTED_MODULE_3__.getHeroesFromDbAC)(resHeroesArray);
-      dispatch(action);
-    }).catch(err => console.log(err)); // 3 get them into an action to dispatch them to the store
-    // 4 use store array to map through the data
-    // console.log(`Inside the effect heroes`)
-    // // get data from API (asking to database)
-    // getAllHeroesDBAPI()
-    // // we will recieve an array with the current heroes in the database
-    //   .then(heroesArray => {
-    //     //todo:  try using thunk here
-    //     console.log(`response form API call in Heroes component:\n`,heroesArray)
-    //   })
-    //   .catch(err => console.log(err))
-  }, []);
+    // dispatch(getHeroCollectionThunk())
+    dispatch((0,_actions__WEBPACK_IMPORTED_MODULE_2__.setAllHeroesThunk)());
+  }, []); // ! RETURNS
+
+  if (loading) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+      className: "container"
+    }, "HEROES ARE LOADING....");
+  }
+
+  if (failed) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+      className: "container"
+    }, "uh-oh.... SOMETHING FAILED.");
+  }
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "heroes-collection"
-  });
+  }, heroArray.collection && heroArray.collection.map((hero, index) => {
+    console.log(hero);
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_SingleHero__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      key: index,
+      hero: hero
+    });
+  }));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (HeroesCollection);
@@ -596,6 +661,36 @@ function Home() {
 
 /***/ }),
 
+/***/ "./client/components/Navigation.jsx":
+/*!******************************************!*\
+  !*** ./client/components/Navigation.jsx ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/index.js");
+
+
+
+function Navigation() {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("nav", {
+    className: "main-navigation"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Link, {
+    to: "/heroes"
+  }, "Home")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Link, {
+    to: "/heroes/collection"
+  }, "My Collection"))));
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Navigation);
+
+/***/ }),
+
 /***/ "./client/components/SingleHero.jsx":
 /*!******************************************!*\
   !*** ./client/components/SingleHero.jsx ***!
@@ -608,27 +703,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-
+ // import functions
 
 function SingleHero(_ref) {
   let {
-    hero
+    hero,
+    addHeroClick
   } = _ref;
   const image = hero.images.sm;
-  console.log(image); // const stats = JSON.parse(hero.powerstats)
+  const {
+    name,
+    race,
+    collected
+  } = hero; // const stats = JSON.parse(hero.powerstats)
   // console.log(`STATS: `,stats)
   // const { intelligence, strength, speed, durability, combat, power } = stats
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "hero"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h3", null, hero.name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h3", null, name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
     src: image,
-    alt: hero.name
+    alt: name
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "hero-info"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Race: ", hero.appearance.race), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Race: ", race), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "power-stats"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "STATS:"))));
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "STATS:"))), !collected && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", {
+    onClick: () => addHeroClick(hero)
+  }, "Add To Collection"), collected && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", null, "Remove"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", null, "Profile"));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SingleHero);
@@ -708,7 +810,11 @@ __webpack_require__.r(__webpack_exports__);
 
 const initialState = {
   loading: true,
-  failed: false
+  failed: false,
+  heroes: {
+    api: [],
+    heroes: []
+  }
 };
 
 function heroesReducer() {
@@ -751,13 +857,20 @@ function heroesReducer() {
         return state;
       }
 
-    case _actions__WEBPACK_IMPORTED_MODULE_0__.ADD_HEROES:
+    case _actions__WEBPACK_IMPORTED_MODULE_0__.FETCH_ALL_HEROES:
       {
-        console.log(`ADD_HEROES: `, state);
-        const res = { ...state,
-          loading: false,
-          heroes: payload
+        return state.map(element => {
+          element.collected = false;
+        });
+      }
+
+    case _actions__WEBPACK_IMPORTED_MODULE_0__.ADD_HEROE:
+      {
+        console.log(`ADD_HEROE: `, state);
+        console.log(`state: `, state);
+        const res = { ...state
         };
+        res.heroes.collection.push(payload);
         console.log(`res: `, res);
         return res;
       }

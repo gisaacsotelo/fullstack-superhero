@@ -1,19 +1,22 @@
 import React from 'react'
+// import functions
 
-function SingleHero({ hero }) {
-  
+
+function SingleHero({ hero , addHeroClick }) {
+
   const image = hero.images.sm
-  console.log(image)
+  const { name, race, collected } = hero
+
   // const stats = JSON.parse(hero.powerstats)
   // console.log(`STATS: `,stats)
   // const { intelligence, strength, speed, durability, combat, power } = stats
 
   return (
     <div className="hero">
-      <h3>{hero.name}</h3>
-      <img src={image} alt={hero.name} />
+      <h3>{name}</h3>
+      <img src={image} alt={name} />
       <section className='hero-info'>
-        <p>Race: {hero.appearance.race}</p>
+        <p>Race: {race}</p>
         <div className='power-stats'>
           <p>STATS:</p>
           {/* <p>Strength: {strength}</p>
@@ -24,6 +27,9 @@ function SingleHero({ hero }) {
           <p>Power: {power}</p> */}
         </div>
       </section>
+      {!collected && <button onClick={() => addHeroClick(hero)}>Add To Collection</button>}
+      {collected && <button>Remove</button>}
+      <button>Profile</button>
     </div>
   )
 }

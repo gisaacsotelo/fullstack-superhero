@@ -4,23 +4,41 @@ import request from 'superagent'
 
 const baseURLAPI = 'https://akabab.github.io/superhero-api/api'
 
-//~getAllHeroesDBAPI
+//~getAllHeroesExtAPI
 export function getAllHeroesExtAPI() {
   // requesting ext API
   return request
     .get(`${baseURLAPI}/all.json`)
     .then((responseAllHeroes) => {
-      const sups = responseAllHeroes.body.slice(130, 145)
-      return sups
+      // trim response to 15 heroes
+      const reducedArrHeroes = responseAllHeroes.body.slice(130, 145)
+      return reducedArrHeroes
     })
     .catch((err) => console.log(err))
 }
 
-// // THUNKS
+// GET heroes
+//  ~getHeroCollectionDB
+export function getHeroCollectionDB(){
+  return request
+    .get('/heroesAPI/v1/heroes')
+    .then(res => {
+      console.log(`response from db: `,res.body)
+      return res.body
+    })
+    .catch((err) => console.log(err))
+}
 
-// export function getAllHeroesThunk(){
-//   return (dispatch) => {
-//     dispatch(getAllHeroesDBAPI())
-
-//   }
-// }
+// POST - add heroe
+// ~addHeroDB
+export function addHeroDB(hero){
+  return request
+    .post('/heroesAPI/v1/heroes')
+    .send(hero)
+    .then((res) => {
+      return res.body
+    })
+    .catch((err) => {
+      err.status(500).send(err.message)
+    })
+}

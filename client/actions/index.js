@@ -1,6 +1,10 @@
 // ^  MAIN ACTION CREATOR
 // import functions from API
-import { getAllHeroesExtAPI } from '../apis/heroesAPI'
+import {
+  getAllHeroesExtAPI,
+  getHeroCollectionDB,
+  addHeroDB,
+} from '../apis/heroesAPI'
 
 // VARIABLES
 // (types from actions) used to trigger errors when
@@ -13,7 +17,8 @@ export const GET_ALL_HEROES = 'GET_ALL_HEROES'
 export const HERO_LOAD_STARTED = 'HERO_LOAD_STARTED'
 export const HERO_LOAD_FAILED = 'HERO_LOAD_FAILED'
 export const HERO_LOAD_COMPLETED = 'HERO_LOAD_COMPLETED'
-export const ADD_HEROES = 'ADD_HEROES'
+export const ADD_HEROE = 'ADD_HEROE'
+export const FETCH_ALL_HEROES = 'FETCH_ALL_HEROES'
 
 // ACTION CREATOR FUNCTIONS
 
@@ -62,12 +67,10 @@ export function heroLoadingFailedAC() {
 }
 
 // ~ addHeroesAC
-export function addHeroesAC(heroes) {
+export function addHeroeAC(heroe) {
   return {
-    loading: true,
-    failed: false,
-    type: ADD_HEROES,
-    payload: heroes,
+    type: ADD_HEROE,
+    payload: heroe,
   }
 }
 
@@ -75,25 +78,57 @@ export function addHeroesAC(heroes) {
 
 // ~setAllHeroesThunk
 export function setAllHeroesThunk() {
-
-  // start loading
-  // request heroes
-  // when recieved: 
-
   return (dispatch) => {
     // tell we are loading
     dispatch(heroLoadingStartedAC())
-    // get the heroes
-    getAllHeroesExtAPI()
-      .then((heroes) => {
-        // fetching succeded
-        const action = heroLoadingCompleteAC(heroes)
-        dispatch(action)
+    // get the heroes 2 promises
+    Promise.all([getAllHeroesExtAPI(), getHeroCollectionDB()])
+      .then((values) => {
+        const responseExtApi = values[0]
+        const responseDatabase = values[1]
+        console.log(values)
+        let apiHeroesFormatted = responseExtApi.map((hero) => {
+          let res = {}
+          res.api_id = hero.id
+          res.name = hero.name
+          res.powerstats = hero.powerstats
+          res.publisher = hero.biography.publisher
+          res.images = hero.images
+          res.race = hero.appearance.race
+          res.collected = false
+          return res
+        })
+        let dbHeroesFormatted = responseDatabase.map((hero) => {
+          let res = { ...hero }
+          res.collected = true
+          return res
+        })
+        const response = {
+          api: apiHeroesFormatted,
+          collection: dbHeroesFormatted,
+        }
+        // completed fetch
+        dispatch(heroLoadingCompleteAC(response))
       })
-      .catch(() => {
-        // fetching failed
-        const action = heroLoadingFailedAC()
-        dispatch(action)
-      })
+      .catch((err) => console.log(err))
   }
 }
+
+// // ~getHeroCollectionThunk
+// export function getHeroCollectionThunk() {
+//   return (dispatch) => {
+//     dispatch(heroLoadingStartedAC())
+//   }
+// }
+
+// // ~addHeroThunk
+// export function addHeroThunk(hero) {
+//   return (dispatch) => {
+//     addHeroDB(hero)
+//     .then(res => {
+//       console.log(`response adding hero: `,res)
+
+//     })
+//     .catch(err => {console.log(err)})
+//   }
+// }

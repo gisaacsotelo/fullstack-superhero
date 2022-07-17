@@ -4,10 +4,11 @@ import {
   HERO_LOAD_STARTED,
   HERO_LOAD_COMPLETED,
   HERO_LOAD_FAILED,
-  ADD_HEROES,
+  ADD_HEROE,
+  FETCH_ALL_HEROES,
 } from '../actions'
 
-const initialState = { loading: true, failed: false }
+const initialState = { loading: true, failed: false, heroes: {api: [], heroes: []} }
 
 function heroesReducer(state = initialState, action) {
   // destructure action
@@ -36,9 +37,16 @@ function heroesReducer(state = initialState, action) {
     case GET_ALL_HEROES: {
       return state
     }
-    case ADD_HEROES: {
-      console.log(`ADD_HEROES: `, state)
-      const res = { ...state, loading: false, heroes: payload }
+    case FETCH_ALL_HEROES: {
+      return (state.map(element => {
+        element.collected = false
+      }))
+    }
+    case ADD_HEROE: {
+      console.log(`ADD_HEROE: `, state)
+      console.log(`state: `,state)
+      const res = { ...state}
+      res.heroes.collection.push(payload)
       console.log(`res: `, res)
       return res
     }

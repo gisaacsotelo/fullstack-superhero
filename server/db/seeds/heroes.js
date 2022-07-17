@@ -1,4 +1,4 @@
-  /**
+/**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
@@ -12,8 +12,9 @@ exports.seed = async function (knex) {
       powerstats:
         '{"intelligence":"63","strength":"63","speed":"70","durability":"84","power":"88","combat":"90"}',
       publisher: 'Marvel Comics',
-      image: 'https://www.superherodb.com/pictures2/portraits/10/100/187.jpg',
+      images: 'https://www.superherodb.com/pictures2/portraits/10/100/187.jpg',
       api_id: 162,
+      race: 'Symbiot',
     },
     {
       id: 2,
@@ -21,8 +22,10 @@ exports.seed = async function (knex) {
       powerstats:
         '{"intelligence":"81","strength":"40","speed":"29","durability":"55","power":"63","combat":"90"}',
       publisher: 'DC Comics',
-      image: 'https://www.superherodb.com/pictures2/portraits/10/100/10441.jpg',
+      images:
+        'https://www.superherodb.com/pictures2/portraits/10/100/10441.jpg',
       api_id: 69,
+      race: 'Human',
     },
     {
       id: 3,
@@ -30,8 +33,9 @@ exports.seed = async function (knex) {
       powerstats:
         '{"intelligence":"50","strength":"80","speed":"32","durability":"80","power":"100","combat":"100"}',
       publisher: 'Shueisha',
-      image: 'https://www.superherodb.com/pictures2/portraits/10/100/1540.jpg',
+      images: 'https://www.superherodb.com/pictures2/portraits/10/100/1540.jpg',
       api_id: 485,
+      race: 'Human',
     },
   ])
 }

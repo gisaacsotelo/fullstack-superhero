@@ -17,10 +17,16 @@ function getAllBooks(db = connection) {
 // ~getAllHeroesDB
 function getAllHeroesDB(db = connection) {
   // selects table heroes all data
-  return db('heroes') 
+  return db('heroes')
+}
+
+// ~addHeroDB
+function addHeroDB(hero, db = connection) {
+  return db('heroes').insert({ hero })
 }
 
 module.exports = {
   getAllBooks,
   getAllHeroesDB,
+  addHeroDB,
 }
