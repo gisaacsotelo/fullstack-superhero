@@ -48,6 +48,14 @@ export function getHeroesFromDbAC(allHeroes) {
   }
 }
 
+// ~ addHeroesAC
+export function addHeroeAC(heroe) {
+  return {
+    type: ADD_HEROE,
+    payload: heroe,
+  }
+}
+
 //* loading actions ---------
 
 // ~ heroLoadingStarted
@@ -65,16 +73,10 @@ export function heroLoadingCompleteAC(heroes) {
 export function heroLoadingFailedAC() {
   return { type: HERO_LOAD_FAILED }
 }
+// * end loading actions -------
 
-// ~ addHeroesAC
-export function addHeroeAC(heroe) {
-  return {
-    type: ADD_HEROE,
-    payload: heroe,
-  }
-}
 
-//*  THUNKS
+//*  THUNKS ------------------------------------------------------
 
 // ~setAllHeroesThunk
 export function setAllHeroesThunk() {
@@ -86,7 +88,6 @@ export function setAllHeroesThunk() {
       .then((values) => {
         const responseExtApi = values[0]
         const responseDatabase = values[1]
-        console.log(values)
         let apiHeroesFormatted = responseExtApi.map((hero) => {
           let res = {}
           res.api_id = hero.id
@@ -113,13 +114,6 @@ export function setAllHeroesThunk() {
       .catch((err) => console.log(err))
   }
 }
-
-// // ~getHeroCollectionThunk
-// export function getHeroCollectionThunk() {
-//   return (dispatch) => {
-//     dispatch(heroLoadingStartedAC())
-//   }
-// }
 
 // // ~addHeroThunk
 // export function addHeroThunk(hero) {

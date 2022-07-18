@@ -20,13 +20,21 @@ function getAllHeroesDB(db = connection) {
   return db('heroes')
 }
 
-// ~addHeroDB
-function addHeroDB(hero, db = connection) {
-  return db('heroes').insert({ hero })
+// ~addHeroToTheDB
+function addHeroToTheDB(hero, db = connection) {
+  return db('heroes').insert( hero )
 }
+
+// ~deleteHeroDB
+function deleteHeroDB(id, db = connection){
+  return db('heroes').del().where('id', id)
+}
+
+
 
 module.exports = {
   getAllBooks,
   getAllHeroesDB,
-  addHeroDB,
+  addHeroToTheDB,
+  deleteHeroDB,
 }

@@ -5,7 +5,11 @@ const express = require('express')
 const router = express.Router()
 
 //Import db functions
-const { getAllHeroesDB, addHeroDB } = require('../db/database')
+const {
+  getAllHeroesDB,
+  addHeroToTheDB,
+  deleteHeroDB,
+} = require('../db/database')
 
 // GET: /heroesAPI/v1/heroes
 router.get('/', (req, res) => {
@@ -19,14 +23,23 @@ router.get('/', (req, res) => {
 // POST: /heroesAPI/v1/heroes
 router.post('/', (req, res) => {
   const newHero = req.body
-  addHeroDB(newHero)
+  addHeroToTheDB(newHero)
     .then((response) => {
-      console.log(`router response: `, response)
       return res.json(newHero)
     })
     .catch((err) => {
       res.status(500).send(err.message)
     })
+})
+
+// DELETE: /heroesAPI/v1/heroes
+router.delete('/:id', (req, res) => {
+  const id = req.params.id
+  deleteHeroDB(id)
+    .then(response => {
+      return response
+    })
+    .catch(err => res.status(500).send(err.message))
 })
 
 // export router

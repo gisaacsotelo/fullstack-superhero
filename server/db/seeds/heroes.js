@@ -15,6 +15,7 @@ exports.seed = async function (knex) {
       images: 'https://www.superherodb.com/pictures2/portraits/10/100/187.jpg',
       api_id: 162,
       race: 'Symbiot',
+      collected: true,
     },
     {
       id: 2,
@@ -26,6 +27,7 @@ exports.seed = async function (knex) {
         'https://www.superherodb.com/pictures2/portraits/10/100/10441.jpg',
       api_id: 69,
       race: 'Human',
+      collected: true,
     },
     {
       id: 3,
@@ -36,6 +38,7 @@ exports.seed = async function (knex) {
       images: 'https://www.superherodb.com/pictures2/portraits/10/100/1540.jpg',
       api_id: 485,
       race: 'Human',
+      collected: true,
     },
   ])
 }

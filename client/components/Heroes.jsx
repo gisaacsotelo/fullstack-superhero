@@ -11,11 +11,10 @@ function Heroes() {
   const heroesState = useSelector(state => state.heroes)
   const dispatch = useDispatch()
  
-  // console.log(`heroesState: `,heroesState)
   const loading = heroesState.loading
   const failed = heroesState.failed
   const heroArray = heroesState.heroes
-  console.log(`heroArray: `,heroArray)
+
   
   // Mounting
   useEffect(()=> {
@@ -25,13 +24,18 @@ function Heroes() {
 
 
 
-  // functions
+  // ^ FUNCTIONS
+
+  // ~ addHeroClick
   const addHeroClick = (hero) => {
-    console.log(`click`, hero)
+
     hero.collected = true
+
+    // todo:
     // addHeroThunk(hero)
+    // so it refreshes the heroes state  w/o the add to collection if already collected
     addHeroDB(hero)
-    dispatch(addHeroeAC(hero))
+    
   }
 
   //  ! RETURNS
@@ -53,10 +57,12 @@ function Heroes() {
 
   return (
     <>
-      <div>Heroes</div>
+      <h2>All Heroes</h2>
+      <div className="heroes">
       {heroArray.api && heroArray.api.map((singleHero, index) => {
         return <SingleHero key={index} hero={singleHero} addHeroClick={addHeroClick} />
       })}
+      </div>
     </>
   )
 }

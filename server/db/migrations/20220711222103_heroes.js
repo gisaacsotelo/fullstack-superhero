@@ -11,6 +11,7 @@ exports.up = function (knex) {
     table.string('images')
     table.string('race')
     table.integer('api_id')
+    table.boolean('collected')
   })
 }
 

@@ -19,11 +19,10 @@ export function getAllHeroesExtAPI() {
 
 // GET heroes
 //  ~getHeroCollectionDB
-export function getHeroCollectionDB(){
+export function getHeroCollectionDB() {
   return request
     .get('/heroesAPI/v1/heroes')
-    .then(res => {
-      console.log(`response from db: `,res.body)
+    .then((res) => {
       return res.body
     })
     .catch((err) => console.log(err))
@@ -31,7 +30,11 @@ export function getHeroCollectionDB(){
 
 // POST - add heroe
 // ~addHeroDB
-export function addHeroDB(hero){
+export function addHeroDB(hero) {
+  // format data to add:
+  // stringify images & powerstats
+  hero.images = JSON.stringify(hero.images)
+  hero.powerstats = JSON.stringify(hero.powerstats)
   return request
     .post('/heroesAPI/v1/heroes')
     .send(hero)
@@ -39,6 +42,20 @@ export function addHeroDB(hero){
       return res.body
     })
     .catch((err) => {
-      err.status(500).send(err.message)
+      console.log(`ERROR ADDING: `, err)
+      // err.status(500).send(err.message)
+    })
+}
+
+// DELETE - hero from collection
+// ~removeHeroAPI
+export function removeHeroAPI(id) {
+  return request
+    .del(`/heroesAPI/v1/heroes/${id}`)
+    .then(response => {
+      return response.body
+    })
+    .catch(err => {
+      console.log(err)
     })
 }
